@@ -2,6 +2,8 @@ from chatterbot import ChatBot
 from chatterbot.trainers import ListTrainer
 from ChanParser.ChanParser import ChanParser
 from chatterbot.trainers import ChatterBotCorpusTrainer
+from multiprocessing import Pool
+import os
 
 def _readFile(path):
     f = open(path)
@@ -35,12 +37,15 @@ threads = [
     '/media/outlaw/BlackBox1/boards.4channel.org/g/79695091/79695091.html'
 ]
 
-
-for thread in threads:
+def _train(thread):
     html = _readFile(thread)
     parser = ChanParser(html)
     trainer = ListTrainer(chatbot)
     trainer.train(parser.posts)
+
+
+p = Pool(os.cpu_count())
+p.map(_train, threads)
 
 while True:
    data = input("Say: ")
